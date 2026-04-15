@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Active Frame simple demo</title>
+  <style>
+    * { margin: 0; box-sizing: border-box; }
+    body { background: #0a0a12; }
+    canvas {display: block; width: 100%; height: 100vh; position: sticky; top: 0; left: 0; z-index: 1000;}
+
+    input[type="range"] {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: calc(100% - 40px);
+      height: 40px;
+      background: #0a0a12;
+      border: 1px solid #fff;
+      border-radius: 5px;
+      overflow: hidden;
+      z-index: 1000;
+     }
+
+     #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+     }
+
+     body {
+      height: 700vh;
+      font-family: Arial, Helvetica, sans-serif;
+     }
+
+     #frame {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      background: black;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px;
+      z-index: 1000;
+     }
+  </style>
+</head>
+<body>
+  <script src="ActiveFrame.js"></script>
+  <canvas id="canvas"></canvas>
+  <h1 id="loading">Loading...</h1>
+  <div id="frame"></div>
+  
+  <script>
+    (async () => {
+      if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+      }
+
+      window.scrollTo(0, 0);
+      
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      // function resize() {
+      //   canvas.width = window.innerWidth;
+      //   canvas.height = window.innerHeight;
+      //   // ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      // }
+
+      // resize();
+      // window.addEventListener('resize', resize);
+  
+      function drawImageCover(image, destW, destH) {
+        const sw = image.displayWidth ?? image.codedWidth;
+        const sh = image.displayHeight ?? image.codedHeight;
+        const scale = Math.max(destW / sw, destH / sh);
+        const tw = sw * scale;
+        const th = sh * scale;
+        const ox = (destW - tw) / 2;
+        const oy = (destH - th) / 2;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(image, 0, 0, sw, sh, ox, oy, tw, th);
+      }
+
+      let portrait = window.innerWidth < window.innerHeight;
+      let codec = 'h265';
+
+      let hardwareAcceleration = 'prefer-hardware';
+
+      if (/\bAndroid\b/i.test(navigator.userAgent)) {
+        // The situation on android is very segmented
+        // Certain hardware accelerated decoders are not efficient with random access
+        // Need to find a better way to detect and degrade
+        // file = 'assets/meridian_1k_h264.af';
+        codec = 'h264';
+        hardwareAcceleration = 'prefer-software';
+      }
+
+      let file = `assets/${portrait ? 'p_' : ''}meridian_${codec}.af`;
+
+      const activeFrame = new ActiveFrame(file, {
+        hardwareAcceleration,
+        process: (frame) => {
+          drawImageCover(frame, canvas.width, canvas.height);
+          document.getElementById('frame').innerHTML = `Frame: ${activeFrame.frame}`;
+        }
+      });
+
+      await activeFrame.loading;
+      document.getElementById('loading').style.display = 'none';
+      activeFrame.setFrame(0);
+
+      window.addEventListener('scroll', function() {
+        const scrollPosition = window.scrollY;
+        const totalHeight = document.body.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const progress = scrollPosition / (totalHeight - viewportHeight);
+        const frame = Math.round(progress * (activeFrame.manifest.totalFrames - 1));
+        activeFrame.setFrame(frame);
+      });
+    })();
+  </script>
+</body>
+</html>

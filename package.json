@@ -1,0 +1,32 @@
+{
+  "name": "activeframe",
+  "version": "0.0.1",
+  "description": "Custom .af video format for WebCodecs: frame-accurate playback without a video tag or third-party decoders.",
+  "license": "MIT",
+  "author": "luruke <lurukee@gmail.com>",
+  "type": "commonjs",
+  "main": "af.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/activetheory/activeframe"
+  },
+  "homepage": "https://github.com/activetheory/activeframe",
+  "bugs": {
+    "url": "https://github.com/activetheory/activeframe/issues"
+  },
+  "keywords": [
+    "video",
+    "webcodecs",
+    "decoder",
+    "activeframe",
+    "active theory"
+  ],
+  "scripts": {
+    "demo": "npx --yes serve@6 --ssl docs",
+    "generate": "cd samples && ./run.sh"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "mp4box": "^2.3.0"
+  }
+}
