@@ -80,6 +80,16 @@
 
       // resize();
       // window.addEventListener('resize', resize);
+
+      function checkSupport(codec) {
+        return VideoDecoder.isConfigSupported({
+          codec: codec === 'h264' ? 'avc1.42c033' : 'hvc1.1.6.L120.90',
+        });
+      }
+
+      function showUnsupported() {
+        document.getElementById('loading').innerHTML = 'Unsupported';
+      }
   
       function drawImageCover(image, destW, destH) {
         const sw = image.displayWidth ?? image.codedWidth;
@@ -95,6 +105,24 @@
 
       let portrait = window.innerWidth < window.innerHeight;
       let codec = 'h265';
+
+      if (!('VideoDecoder' in window)) {
+        return showUnsupported();
+      }
+
+      const [supportH265, supportH264] = await Promise.all([checkSupport('h265'), checkSupport('h264')]);
+
+      if (!supportH265.supported && !supportH264.supported) {
+        return showUnsupported();
+      }
+
+      if (supportH265.supported) {
+        codec = 'h265';
+      } else {
+        codec = 'h264';
+      }
+
+      console.log(supportH265, supportH264);
 
       let hardwareAcceleration = 'prefer-hardware';
 
