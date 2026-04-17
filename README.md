@@ -3,7 +3,8 @@
 ![ActiveFrame sample](./docs/assets/sample.gif)
 ![ActiveFrame sample2](./docs/assets/sample2.gif)
 
-Demo: https://activetheory.github.io/activeframe/
+Demo: https://activetheory.github.io/activeframe/  
+[More Context](https://x.com/luruke/status/2037511335257223626?s=20)
 
 ActiveFrame is a small pipeline and javascript library for turning a video into a **single binary `.af` file** and decoding it in the browser with the **Web Codec API** — without a `<video>` element and **without third-party dependencies** such as FFmpeg.wasm, Mediabunny, or other JS demuxers/decoders.
 
@@ -17,6 +18,8 @@ The file packs **raw encoded samples** (H.264 / H.265) plus a **JSON manifest**.
 - Feed the frame natively to WebGL/WebGPU and Canvas 2D
 - Hardware accelerated**
 - Optimized for interactive scrubbing, 3D, image-like control over which frame is shown
+- You can keep multiple videos "in sync"
+- Predictable loading times, buffering, etc
 
 ---
 
